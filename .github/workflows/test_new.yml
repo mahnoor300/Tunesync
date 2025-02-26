@@ -19,16 +19,20 @@ jobs:
         with:
           node-version: '18'
 
+      # Increase Node.js memory limit to avoid heap errors
+      - name: Increase Node.js memory limit
+        run: export NODE_OPTIONS="--max-old-space-size=8192"
+
       # Install dependencies (yarn install)
       - name: Install dependencies
         run: |
           yarn install --no-frozen-lockfile
 
-      # Update Expo modules to the latest version
+      # Update Expo dependencies
       - name: Update Expo dependencies
         run: |
-          yarn upgrade expo@latest
-          yarn upgrade expo-media-library@latest
+          yarn upgrade expo@latest --no-immutable
+          yarn upgrade expo-media-library@latest --no-immutable
 
       # Set up JDK 17 (to match Android Gradle plugin requirement)
       - name: Set up JDK 17
