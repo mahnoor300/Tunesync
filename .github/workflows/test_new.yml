@@ -10,7 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      # Checkout the repository
+      - uses: actions/checkout@v2
+
+      # Set up Node.js (use version 16 or latest LTS)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      # Install dependencies (yarn install)
+      - name: Install dependencies
+        run: |
+          yarn install --no-frozen-lockfile
+
+      # Update Expo modules to the latest version
+      - name: Update Expo dependencies
+        run: |
+          yarn upgrade expo@latest
+          yarn upgrade expo-media-library@latest
 
       # Set up JDK 17 (to match Android Gradle plugin requirement)
       - name: Set up JDK 17
@@ -24,16 +42,19 @@ jobs:
           rm -rf node_modules
           rm -rf android/build
           yarn install --no-frozen-lockfile  # Reinstall dependencies
+
       # Grant execute permissions to gradlew
       - name: Grant execute permissions to gradlew
         run: chmod +x ./android/gradlew
 
-      # Run the build process
+      # Navigate to Android directory and clean build
       - name: Navigate to Android directory and clean build
         run: |
           cd ./android
           ls -l  # Check if gradlew is in the correct directory
           ./gradlew clean
+
+      # Build debug APK
       - name: Build debug APK
         run: cd android && ./gradlew assembleDebug --stacktrace 
 
@@ -41,7 +62,7 @@ jobs:
       - name: Rename APK 
         run:
           mv "./app/build/outputs/apk/debug/app-debug.apk" "./app/build/outputs/apk/debug/${{ env.OUTPUT_NAME }}.apk"
-        
+
       # Upload the APK as an artifact
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
