@@ -28,14 +28,23 @@ jobs:
           node-version: '18' # Use the version specified in your project
           cache: 'yarn'
 
-      # Upgrade Expo SDK and dependencies
+      # Manually upgrade Expo SDK and dependencies
       - name: Upgrade Expo SDK
         run: |
-          npx expo upgrade
+          # Update expo package
+          yarn add expo@latest
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
+          # Update react-native and other dependencies
+          yarn add react-native@latest
+          yarn add react@latest
+          yarn add react-dom@latest
+
+          # Update Expo-related packages
+          yarn add expo-modules-core@latest
+          yarn add expo-media-library@latest
+          yarn add @react-native-community/cli@latest
+
+          # Install all dependencies
           yarn install --frozen-lockfile
 
       # Grant execute permissions to gradlew
