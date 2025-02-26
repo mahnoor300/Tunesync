@@ -11,60 +11,54 @@ jobs:
 
     steps:
       # Checkout the repository
-      - uses: actions/checkout@v2
-
-      # Set up Node.js (use version 16 or latest LTS)
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-
-      # Increase Node.js memory limit to avoid heap errors
-      - name: Increase Node.js memory limit
-        run: export NODE_OPTIONS="--max-old-space-size=8192"
-
-      # Install dependencies (yarn install)
-      - name: Install dependencies
-        run: |
-          yarn install --no-frozen-lockfile
-
-      # Update Expo dependencies
-      - name: Update Expo dependencies
-        run: |
-          yarn upgrade expo@latest --no-immutable
-          yarn upgrade expo-media-library@latest --no-immutable
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       # Set up JDK 17 (to match Android Gradle plugin requirement)
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin'
+
+      # Set up Node.js (ensure compatibility with Expo)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Use the version specified in your project
+          cache: 'yarn'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
 
       # Clean the project (remove node_modules and android/build)
       - name: Clean project
         run: |
           rm -rf node_modules
           rm -rf android/build
-          yarn install --no-frozen-lockfile  # Reinstall dependencies
 
       # Grant execute permissions to gradlew
       - name: Grant execute permissions to gradlew
         run: chmod +x ./android/gradlew
 
-      # Navigate to Android directory and clean build
+      # Run the build process
       - name: Navigate to Android directory and clean build
         run: |
           cd ./android
           ls -l  # Check if gradlew is in the correct directory
           ./gradlew clean
 
-      # Build debug APK
+      # Build debug APK with stacktrace for debugging
       - name: Build debug APK
-        run: cd android && ./gradlew assembleDebug --stacktrace 
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace --info
 
       # Rename APK for output
-      - name: Rename APK 
-        run:
+      - name: Rename APK
+        run: |
           mv "./app/build/outputs/apk/debug/app-debug.apk" "./app/build/outputs/apk/debug/${{ env.OUTPUT_NAME }}.apk"
 
       # Upload the APK as an artifact
