@@ -25,27 +25,30 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Use the version specified in your project
+          node-version: '18'
           cache: 'yarn'
 
-      # Manually upgrade Expo SDK and dependencies
+      # Clean the project
+      - name: Clean project
+        run: |
+          rm -rf node_modules
+          rm -rf android/build
+
+      # Upgrade Expo SDK with increased memory limit
       - name: Upgrade Expo SDK
         run: |
-          # Update expo package
-          yarn add expo@latest
+          node --max-old-space-size=4096 $(which yarn) add expo@latest
+          node --max-old-space-size=4096 $(which yarn) add react-native@latest
+          node --max-old-space-size=4096 $(which yarn) add react@latest
+          node --max-old-space-size=4096 $(which yarn) add react-dom@latest
+          node --max-old-space-size=4096 $(which yarn) add expo-modules-core@latest
+          node --max-old-space-size=4096 $(which yarn) add expo-media-library@latest
+          node --max-old-space-size=4096 $(which yarn) add @react-native-community/cli@latest
 
-          # Update react-native and other dependencies
-          yarn add react-native@latest
-          yarn add react@latest
-          yarn add react-dom@latest
-
-          # Update Expo-related packages
-          yarn add expo-modules-core@latest
-          yarn add expo-media-library@latest
-          yarn add @react-native-community/cli@latest
-
-          # Install all dependencies
-          yarn install --frozen-lockfile
+      # Install dependencies with increased memory limit
+      - name: Install dependencies
+        run: |
+          node --max-old-space-size=4096 $(which yarn) install --frozen-lockfile
 
       # Grant execute permissions to gradlew
       - name: Grant execute permissions to gradlew
