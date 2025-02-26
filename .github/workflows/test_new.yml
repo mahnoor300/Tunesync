@@ -28,11 +28,11 @@ jobs:
           node-version: '18'
           cache: 'yarn'
 
-      # Clean the project
       - name: Clean project
         run: |
-          rm -rf node_modules
-          rm -rf android/build
+          Remove-Item -Recurse -Force node_modules
+          Remove-Item -Recurse -Force android/build
+          yarn install --no-frozen-lockfile  # Reinstall dependencies
 
       # Upgrade Expo SDK with increased memory limit
       - name: Upgrade Expo SDK
