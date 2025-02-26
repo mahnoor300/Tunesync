@@ -30,8 +30,7 @@ jobs:
 
       - name: Clean project
         run: |
-          Remove-Item -Recurse -Force node_modules
-          Remove-Item -Recurse -Force android/build
+
           yarn install --no-frozen-lockfile  # Reinstall dependencies
 
       # Upgrade Expo SDK with increased memory limit
