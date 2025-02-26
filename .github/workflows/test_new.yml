@@ -14,18 +14,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up JDK 17 (to match Android Gradle plugin requirement)
+      # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Set up Node.js (ensure compatibility with Expo)
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Use the version specified in your project
+          node-version: '18'
           cache: 'yarn'
 
       # Install dependencies
@@ -33,11 +33,11 @@ jobs:
         run: |
           yarn install --frozen-lockfile
 
-      # Clean the project (remove node_modules and android/build)
-      - name: Clean project
+      # Debug: Verify Node.js installation
+      - name: Verify Node.js installation
         run: |
-          rm -rf node_modules
-          rm -rf android/build
+          node --version
+          npm --version
 
       # Grant execute permissions to gradlew
       - name: Grant execute permissions to gradlew
@@ -47,7 +47,6 @@ jobs:
       - name: Navigate to Android directory and clean build
         run: |
           cd ./android
-          ls -l  # Check if gradlew is in the correct directory
           ./gradlew clean
 
       # Build debug APK with stacktrace for debugging
